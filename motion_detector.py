@@ -1,6 +1,12 @@
 import cv2, time
+from datetime import datetime
 
 first_frame = None
+status_list = [None,None]
+times =[]
+
+#   Voglio stampare i contenuti della "registrazione" in un Panda's dataframe
+df = pandas.DataFrame(columns=["Starts", "Ends"])
 
 #   0 è l'indice della webcam
 video = cv2.VideoCapture(0)
@@ -9,7 +15,8 @@ video = cv2.VideoCapture(0)
 #   check è un boolean datatype (true or false) , frame è un numpy array ( [121...1515])
 while True :
     check, frame = video.read()
-
+    #   Status 0 = non rileva oggetti | Status 1 = rileva oggetti
+    status = 0
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     #   Aggiungo una sfocatura perchè riduce il rumore dell'immagine ed aumenta l'accuratezza dell'algoritmo
     gray = cv2.GaussianBlur(gray,(21,21),0)
@@ -28,12 +35,23 @@ while True :
     #   Definizione dei contorni
     (_,cnts,_) = cv2.findContours(thresh_frame.copy(),cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    #   Creo il rettangolo
+    #   Creo il rettangolo | in base alla dimensione del raggio di cattura della webcam aumento il valore di 10000
     for contour in cnts:
-        if cv2.contourArea(contour) < 1000:
+        if cv2.contourArea(contour) < 10000:
             continue
+        status = 1
         (x, y, w, h) = cv2.boundingRect(contour)
         cv2.rectangle(frame, (x, y), (x+w, y+h), (0,255,0), 3)
+
+    status_list.append(status)
+    #   Metodo per calcolare per quanto tempo l'oggetto si trova nell'inquadratura, quindi status = 1
+    #   status_list = [0, 1]  [-1] e [-2] sono gli indici della status list
+    if status_list[-1] == 1 and status_list [-2] == 0 :
+        times.append(datetime.now())
+
+    if status_list[-1] == 0 and status_list [-2] == 1 :
+        times.append(datetime.now())
+
 
     cv2.imshow("Gray Frame", gray)
     cv2.imshow("Delta Frame",delta_frame)
@@ -43,7 +61,18 @@ while True :
     key = cv2.waitKey(1)
 
     if key == ord('q'):
+        if status == 1 :
+            times.append(datetime.now())
         break
+
+print(status_list)
+print(times)
+
+
+for i in range (0, len(times), 2):
+    df = df.append({"Inizio : " : times[i], "Fine : ": times[i+1]}, ignore_index=True)
+#   Stampo su csv file
+df.to_csv("Rilevamenti.csv")
 
 video.release()
 cv2.destroyAllWindows
