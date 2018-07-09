@@ -1,8 +1,11 @@
 ### Video Motion Detector by your webcam
 
 
+
+
 ### Requirements  :
 ```bash
+$ 
 
 $ pip install wheel
 $ pip install pandas
@@ -14,6 +17,7 @@ $ pip install opencv-python
 
 to run the program write in the cmd line :
 ```bash
+$ 
 
 $ python motion_detector.py
 
