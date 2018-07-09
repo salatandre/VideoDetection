@@ -72,7 +72,7 @@ while True :
 for i in range (0, len(times), 2):
     df = df.append({"Inizio" : times[i], "Fine": times[i+1]}, ignore_index=True)
 #   Stampo su csv file
-df.to_csv("Rilevamenti.csv")
+df.to_csv("detections.csv")
 
 video.release()
 cv2.destroyAllWindows
