@@ -1,4 +1,4 @@
-import cv2, time
+import cv2, time, pandas
 from datetime import datetime
 
 first_frame = None
@@ -6,7 +6,7 @@ status_list = [None,None]
 times =[]
 
 #   Voglio stampare i contenuti della "registrazione" in un Panda's dataframe
-df = pandas.DataFrame(columns=["Starts", "Ends"])
+df = pandas.DataFrame(columns=["Inizio", "Fine"])
 
 #   0 è l'indice della webcam
 video = cv2.VideoCapture(0)
@@ -70,7 +70,7 @@ print(times)
 
 
 for i in range (0, len(times), 2):
-    df = df.append({"Inizio : " : times[i], "Fine : ": times[i+1]}, ignore_index=True)
+    df = df.append({"Inizio" : times[i], "Fine": times[i+1]}, ignore_index=True)
 #   Stampo su csv file
 df.to_csv("Rilevamenti.csv")
 
